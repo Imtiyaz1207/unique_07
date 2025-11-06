@@ -17,6 +17,7 @@
       margin: 0;
       padding: 0 20px;
     }
+
     .container {
       background: rgba(243, 237, 243, 0.65);
       padding: 60px 30px;
@@ -26,18 +27,23 @@
       width: 100%;
       opacity: 1;
       transition: opacity 0.3s ease, transform 0.1s ease;
+      position: relative; /* For child absolute positioning */
     }
+
     input { 
       padding: 10px; border: none; border-radius: 10px; 
       width: 80%; margin-top: 15px; font-size: 16px; text-align:center; 
     }
+
     button { 
       margin-top: 20px; padding: 10px 20px; border-radius: 10px; 
       border: none; background-color: #0e0808; color: white; 
       font-weight:bold; cursor:pointer; 
       transition: transform 0.1s ease;
     }
+
     button:hover { background-color: #ff6b81; }
+
     #message { display: none; opacity:0; transition: opacity 0.5s ease; }
     #errorMsg {
       color: red;
@@ -47,12 +53,14 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
+
     @media(max-width:480px) { 
       .container { padding:40px 20px; } 
       input { width:90%; } 
       h1{font-size:24px;} 
       p{font-size:16px;} 
     }
+
     @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-6px); }
@@ -62,6 +70,22 @@
       100% { transform: translateX(0); }
     }
     .shake { animation: shake 0.35s; }
+
+    /* Floating messages inside secret container */
+    #takeCareMsg, #new {
+      position: absolute;
+      font-weight: bold;
+    }
+
+    /* Default positions for desktop */
+    #takeCareMsg { bottom: 60px; left: 20px; }
+    #new { bottom: 30px; left: 20px; }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 480px) {
+      #takeCareMsg { bottom: 50px; left: 10px; font-size: 14px; }
+      #new { bottom: 25px; left: 10px; font-size: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -77,25 +101,17 @@
     <button onclick="checkPassword()">Submit</button>
     <div id="errorMsg">❌ Wrong password! Try again 💔</div>
   </div>
-<!-- Secret Message Section -->
-<div id="message" class="container">
-  <h1>Hii Fathima!</h1>
-  <p>Agar aap yeh message padre tho plzz at least kuch tho response dho...I really want to be your friend🌸</p>
-  <p>I'll wait for your response 😊💫</p>
-  <p>Take care bye..🦋</p>
-  <p id="takeCareMsg">Plz..Unblock my insta ID</p>
-  <p id="new">And sorry..</p>
-</div>
-<script>
-    document.getElementById("new").style.cssText = "position:absolute; bottom:160px; left:370px;";
-</script>
-<!-- Your JS line goes here -->
-<script>
-document.getElementById("takeCareMsg").style.cssText = "position:absolute; bottom:180px; left:370px;";
-</script>
 
+  <!-- Secret Message Section -->
+  <div id="message" class="container">
+    <h1>Hii Fathima!</h1>
+    <p>Agar aap yeh message padre tho plzz at least kuch tho response dho...I really want to be your friend🌸</p>
+    <p>I'll wait for your response 😊💫</p>
 
- 
+    <!-- Floating messages -->
+    <p id="takeCareMsg">Plz..Unblock my insta ID</p>
+    <p id="new">And sorry..</p>
+  </div>
 
   <script>
     const bgMusic = document.getElementById("bgMusic");
@@ -118,11 +134,9 @@ document.getElementById("takeCareMsg").style.cssText = "position:absolute; botto
       errorMsg.style.display = "block";
       setTimeout(() => { errorMsg.style.opacity = 1; }, 50);
 
-      // Shake animation
       loginDiv.classList.add("shake");
       setTimeout(() => { loginDiv.classList.remove("shake"); }, 350);
 
-      // Fade out after 2s
       setTimeout(() => {
         errorMsg.style.opacity = 0;
         setTimeout(() => { errorMsg.style.display = "none"; }, 300);
@@ -143,7 +157,6 @@ document.getElementById("takeCareMsg").style.cssText = "position:absolute; botto
         body: JSON.stringify({ password: entered })
       }).catch(err => console.log("Logging failed:", err));
 
-      // Immediate feedback (correct or wrong)
       if(entered === "23E51A05C1"){
         // Correct password: fade login, show secret
         loginDiv.style.opacity = 0;
@@ -155,7 +168,6 @@ document.getElementById("takeCareMsg").style.cssText = "position:absolute; botto
 
         fadeInMusic(bgMusic, 1500);
       } else {
-        // Wrong password
         showErrorMessage();
       }
     }
