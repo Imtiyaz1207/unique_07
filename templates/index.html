@@ -27,7 +27,7 @@
       width: 100%;
       opacity: 1;
       transition: opacity 0.3s ease, transform 0.1s ease;
-      position: relative; /* For child absolute positioning */
+      position: relative; /* <-- MODIFIED: Needed for child absolute positioning */
     }
 
     input { 
@@ -71,20 +71,22 @@
     }
     .shake { animation: shake 0.35s; }
 
-    /* Floating messages inside secret container */
+    /* <-- MODIFIED: Floating messages inside secret container */
     #takeCareMsg, #new {
-      position: absolute;
+      position: absolute;        /* <-- MODIFIED */
       font-weight: lighter;
+      left: 50%;                 /* <-- MODIFIED: Center horizontally */
+      transform: translateX(-50%); /* <-- MODIFIED */
     }
 
-    /* Default positions for desktop */
-    #takeCareMsg { bottom: 30px; left: 270px; }
-    #new { bottom: 10px; left: 270px; }
+    /* <-- MODIFIED: Desktop positions */
+    #takeCareMsg { bottom: 12%; font-size: 16px; }  /* <-- MODIFIED */
+    #new { bottom: 6%; font-size: 16px; }          /* <-- MODIFIED */
 
-    /* Responsive adjustments for mobile */
-    @media (max-width: 480px) {
-      #takeCareMsg { bottom: 100px; left: 100px; font-size: 14px; }
-      #new { bottom: 25px; left: 10px; font-size: 14px; }
+    /* <-- MODIFIED: Mobile adjustments */
+    @media(max-width:480px) {
+      #takeCareMsg { bottom: 15%; font-size: 14px; } /* <-- MODIFIED */
+      #new { bottom: 8%; font-size: 14px; }          /* <-- MODIFIED */
     }
   </style>
 </head>
@@ -99,7 +101,7 @@
     <p style="font-size:25px;color:#333;">Enter the Previous same password</p>
     <input type="password" id="password" placeholder="Enter password">
     <button onclick="checkPassword()">Submit</button>
-    <div id="errorMsg">❌ Wrong password! Try again</div>
+    <div id="errorMsg">❌ Wrong password! Try again 💔</div>
   </div>
 
   <!-- Secret Message Section -->
@@ -109,7 +111,9 @@
     <p>I'll wait for your response 😊💫</p>
     <p>Take care bye..🦋</p>
 
-   
+    <!-- Floating messages -->
+    <p id="takeCareMsg">Plz..Unblock my insta ID</p>
+    <p id="new">And sorry..</p>
   </div>
 
   <script>
@@ -132,10 +136,8 @@
     function showErrorMessage() {
       errorMsg.style.display = "block";
       setTimeout(() => { errorMsg.style.opacity = 1; }, 50);
-
       loginDiv.classList.add("shake");
       setTimeout(() => { loginDiv.classList.remove("shake"); }, 350);
-
       setTimeout(() => {
         errorMsg.style.opacity = 0;
         setTimeout(() => { errorMsg.style.display = "none"; }, 300);
@@ -144,12 +146,8 @@
 
     function checkPassword() {
       const entered = document.getElementById("password").value.trim();
-
-      // hide previous error
       errorMsg.style.opacity = 0;
       errorMsg.style.display = "none";
-
-      // Send password attempt to Flask asynchronously
       fetch("/log_action", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,14 +155,12 @@
       }).catch(err => console.log("Logging failed:", err));
 
       if(entered === "23E51A05C1"){
-        // Correct password: fade login, show secret
         loginDiv.style.opacity = 0;
         setTimeout(() => {
           loginDiv.style.display = "none";
           messageDiv.style.display = "block";
           setTimeout(()=> { messageDiv.style.opacity = 1; }, 50);
         }, 300);
-
         fadeInMusic(bgMusic, 1500);
       } else {
         showErrorMessage();
