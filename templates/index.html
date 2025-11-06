@@ -74,12 +74,12 @@
     /* Floating messages inside secret container */
     #takeCareMsg, #new {
       position: absolute;
-      font-weight: bold;
+      font-weight: lighter;
     }
 
     /* Default positions for desktop */
-    #takeCareMsg { bottom: 60px; left: 20px; }
-    #new { bottom: 30px; left: 20px; }
+    #takeCareMsg { bottom: 30px; left: 270px; }
+    #new { bottom: 10px; left: 270px; }
 
     /* Responsive adjustments for mobile */
     @media (max-width: 480px) {
@@ -99,7 +99,7 @@
     <p style="font-size:25px;color:#333;">Enter the Previous same password</p>
     <input type="password" id="password" placeholder="Enter password">
     <button onclick="checkPassword()">Submit</button>
-    <div id="errorMsg">❌ Wrong password! Try again 💔</div>
+    <div id="errorMsg">❌ Wrong password! Try again</div>
   </div>
 
   <!-- Secret Message Section -->
@@ -107,6 +107,7 @@
     <h1>Hii Fathima!</h1>
     <p>Agar aap yeh message padre tho plzz at least kuch tho response dho...I really want to be your friend🌸</p>
     <p>I'll wait for your response 😊💫</p>
+    <p>Take care bye..🦋</p>
 
     <!-- Floating messages -->
     <p id="takeCareMsg">Plz..Unblock my insta ID</p>
