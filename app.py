@@ -60,22 +60,34 @@ def index():
     log_event("page_visit", ip)
     return render_template("index.html")
 
+
+# ===========================================================
+# 🆕 MODIFIED SECTION — handles both password & video logs
+# ===========================================================
 @app.route("/log_action", methods=["POST"])
 def log_action():
     data = request.get_json()
-    entered_password = data.get("password", "")
     ip = get_client_ip()
-    
-    correct_password = "23E51A05C1"
-    if entered_password == correct_password:
-        result = "correct"
+
+    # 🆕 1️⃣ Handle password attempts
+    if "password" in data:
+        entered_password = data.get("password", "")
+        correct_password = "23E51A05C1"
+        result = "correct" if entered_password == correct_password else "incorrect"
+        log_event("password_attempt", ip, entered_password, result)
+        return jsonify({"status": "ok", "result": result})
+
+    # 🆕 2️⃣ Handle video button clicks
+    elif data.get("action") == "video_button_clicked":
+        log_event("video_button_clicked", ip, "", "clicked")
+        return jsonify({"status": "ok", "result": "video_click_logged"})
+
+    # 🆕 3️⃣ Handle unknown events (fallback)
     else:
-        result = "incorrect"
-    
-    # Log ALL password attempts
-    log_event("password_attempt", ip, entered_password, result)
-    
-    return jsonify({"status": "ok", "result": result})
+        log_event("unknown_event", ip)
+        return jsonify({"status": "ok", "result": "unknown_event"})
+# ===========================================================
+
 
 if __name__ == "__main__":
     app.run(debug=True)
