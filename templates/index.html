@@ -120,7 +120,7 @@
     <p>I'll wait for your response 😊💫</p>
     <p>Take care bye..🦋</p>
   <!-- 🌸 Add Video Button and Player -->
-  <button onclick="playVideo()">For you😊🦋</button>
+  <button onclick="playVideo()">For you😊🦋</button><p>Tap here 👆</p>
   <video 
   id="secretVideo" 
   width="300" height="200"
@@ -222,6 +222,29 @@
       video.pause();          // stop before last 4 seconds
       video.currentTime = 0;  // optional: reset to start
     }
+  });
+</script>
+<!-- Built with love footer -->
+<div id="footerText" style="
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 1s ease;
+">
+  Built with ❤️ by shaik✨
+</div>
+
+<script>
+  // Fade-in footer after visiting the page
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('footerText').style.opacity = 1;
+    }, 1000); // appears 1 second after page load
   });
 </script>
 
