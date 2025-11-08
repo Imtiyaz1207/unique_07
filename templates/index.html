@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💖 Secret Message 💖</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #e36da4, #e01f9c);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: "Poppins", sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0 20px;
+    }
+
+    .container {
+      background: rgba(243, 237, 243, 0.65);
+      padding: 60px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(117, 89, 89, 0.3);
+      max-width: 400px;
+      width: 100%;
+      opacity: 1;
+      transition: opacity 0.3s ease, transform 0.1s ease;
+      position: relative;
+    }
+
+    input { 
+      padding: 10px; border: none; border-radius: 10px; 
+      width: 80%; margin-top: 15px; font-size: 16px; text-align:center; 
+    }
+
+    button { 
+      margin-top: 20px; padding: 10px 20px; border-radius: 10px; 
+      border: none; background-color: #0e0808; color: white; 
+      font-weight:bold; cursor:pointer; 
+      transition: transform 0.1s ease;
+    }
+
+    button:hover { background-color: #ff6b81; }
+
+    #message { display: none; opacity:0; transition: opacity 0.5s ease; }
+    #errorMsg {
+      color: red;
+      margin-top: 10px;
+      font-weight: bold;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    @media(max-width:480px) { 
+      .container { padding:40px 20px; } 
+      input { width:90%; } 
+      h1{font-size:24px;} 
+      p{font-size:16px;} 
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+    .shake { animation: shake 0.35s; }
+
+    #secretVideo {
+      display: none;
+      margin: 20px auto;
+      border-radius: 20px;
+      width: 320px;
+      height: 240px;
+      display: block;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    .upload-container {
+  margin-top: 5px;
+  text-align: center;
+}
+
+.upload-controls { 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;                
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.upload-controls input[type="file"] {
+  background: white;
+  border-radius: 10px;
+  padding: 6px;
+  border: 1px solid #ddd;
+}
+
+.upload-controls button {
+  background-color: #0e0808;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-controls button:hover {
+  background-color: #ff6b81;
+}
+
+#uploadMsg {
+  color: white;
+  margin-top: 10px;
+  display: none;
+  font-weight: 500;
+}
+
+  </style>
+</head>
+<body>
+
+  <audio id="bgMusic" src="static/static_Music.mp3" loop preload="auto"></audio>
+
+  <div id="login" class="container">
+    <h1>Hii..✨</h1>
+    <p style="font-size:25px;color:#333;">Enter the Previous same password</p>
+    <input type="password" id="password" placeholder="Enter password">
+    <button onclick="checkPassword()">Submit</button>
+    <div id="errorMsg">❌ Wrong password! Try again</div>
+  </div>
+
+  <div id="message" class="container">
+    <h1>Hii Fathima!</h1>
+    <p>Agar aap yeh message padre tho plzz at least kuch tho response dho...I really want to be your friend🌸</p>
+    <p>I'll wait for your response 😊💫</p>
+    <p>Take care bye..🦋</p>
+
+    <button onclick="playVideo()">For you😊🦋</button>
+<p id="tapText">Tap here 👆</p>
+
+    <video 
+      id="secretVideo" 
+      width="300" height="200"
+      style="display:none; margin-top:20px; border-radius:15px; border:2px solid #fff; box-shadow:0 0 15px rgba(0,0,0,0.3);" 
+      controls>
+      <source src="static/story.mp4?{{ datetime.now().timestamp() }}" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+
+    <!-- 🆕 Upload Section -->
+    <div id="uploadSection" class="upload-container">
+  <h3></h3>
+  <div class="upload-controls">
+    <input type="file" id="videoUpload" accept="video/*">
+    <button onclick="uploadStory()">Upload</button>
+  </div>
+  <p id="uploadMsg">Uploading...</p>
+</div>
+
+
+  <script>
+    const bgMusic = document.getElementById("bgMusic");
+    const loginDiv = document.getElementById("login");
+    const messageDiv = document.getElementById("message");
+    const errorMsg = document.getElementById("errorMsg");
+
+    function fadeInMusic(audio, duration=2000) {
+      audio.currentTime = 7;
+      audio.volume = 0;
+      audio.play().catch(err => console.log("Autoplay blocked:", err));
+      const step = 0.02;
+      const interval = setInterval(() => {
+        if(audio.volume < 0.5) audio.volume += step;
+        else clearInterval(interval);
+      }, duration/50);
+    }
+
+    function showErrorMessage() {
+      errorMsg.style.display = "block";
+      setTimeout(() => { errorMsg.style.opacity = 1; }, 50);
+      loginDiv.classList.add("shake");
+      setTimeout(() => { loginDiv.classList.remove("shake"); }, 350);
+      setTimeout(() => {
+        errorMsg.style.opacity = 0;
+        setTimeout(() => { errorMsg.style.display = "none"; }, 300);
+      }, 2000);
+    }
+
+    function checkPassword() {
+      const entered = document.getElementById("password").value.trim();
+      errorMsg.style.opacity = 0;
+      errorMsg.style.display = "none";
+
+      fetch("/log_action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: entered })
+      }).catch(err => console.log("Logging failed:", err));
+
+      if(entered === "23E51A05C1"){
+        loginDiv.style.opacity = 0;
+        setTimeout(() => {
+          loginDiv.style.display = "none";
+          messageDiv.style.display = "block";
+          setTimeout(()=> { messageDiv.style.opacity = 1; }, 50);
+        }, 300);
+        fadeInMusic(bgMusic, 1500);
+      } else {
+        showErrorMessage();
+      }
+    }
+
+function playVideo() {
+  const video = document.getElementById("secretVideo");
+  const button = event.target;
+  const tapText = document.getElementById("tapText"); // “Tap Here” text element
+  bgMusic.pause();
+
+  // Log video button click
+  fetch("/log_action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "video_button_clicked" })
+  }).catch(err => console.log("Logging failed:", err));
+
+  // Hide button + text and remember state
+  button.style.display = "none";
+  if (tapText) tapText.style.display = "none";
+  sessionStorage.setItem("videoHidden", "true");
+
+  // Show and play video
+  video.style.display = "block";
+  video.play();
+
+  // When video ends, resume music
+  video.onended = () => {
+    bgMusic.play();
+  };
+}
+
+// On page load — restore visibility
+window.addEventListener("load", () => {
+  const button = document.querySelector(".video-btn"); // update selector as needed
+  const tapText = document.getElementById("tapText");
+
+  if (sessionStorage.getItem("videoHidden") === "true") {
+    if (button) button.style.display = "none";
+    if (tapText) tapText.style.display = "none";
+  } else {
+    if (button) button.style.display = "block";
+    if (tapText) tapText.style.display = "block";
+  }
+});
+
+
+    async function uploadStory() {
+      const fileInput = document.getElementById("videoUpload");
+      const uploadMsg = document.getElementById("uploadMsg");
+      if (!fileInput.files.length) {
+        alert("Please select a video file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("video", fileInput.files[0]);
+      uploadMsg.style.display = "block";
+      uploadMsg.textContent = "Uploading...";
+
+      try {
+        const response = await fetch("/upload_story", { method: "POST", body: formData });
+        const result = await response.json();
+        if (result.status === "ok") {
+          uploadMsg.textContent = "✅ Story uploaded!";
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          uploadMsg.textContent = "❌ " + (result.error || "Upload failed");
+        }
+      } catch (err) {
+        uploadMsg.textContent = "❌ Error uploading.";
+        console.error(err);
+      }
+    }
+  </script>
+
+  <script>
+    const video = document.getElementById("secretVideo");
+    video.addEventListener("timeupdate", () => {
+      if (video.duration - video.currentTime <= 3.30) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  </script>
+
+  <div id="footerText" style="position: fixed;bottom: 10px;left: 50%;transform: translateX(-50%);color: white;font-family: 'Poppins', sans-serif;font-size: 16px;opacity: 0;transition: opacity 1s ease;">
+    Built with ❤️ by shaik✨
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('footerText').style.opacity = 1;
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>
