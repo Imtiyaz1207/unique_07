@@ -26,7 +26,7 @@ if not os.path.exists(LOG_FILE):
 india = pytz.timezone('Asia/Kolkata')
 
 # Folder for uploads
-UPLOAD_FOLDER = "static/video.mp4"
+UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"mp4", "mov", "avi", "mkv"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
@@ -122,3 +122,4 @@ def upload_story():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
