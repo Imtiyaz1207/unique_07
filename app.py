@@ -5,6 +5,7 @@ import requests
 import os
 import csv
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename  # 🆕 for uploads
 
 app = Flask(__name__)
 
@@ -23,6 +24,14 @@ if not os.path.exists(LOG_FILE):
 
 # Indian timezone
 india = pytz.timezone('Asia/Kolkata')
+
+# Folder for uploads
+UPLOAD_FOLDER = "static"
+ALLOWED_EXTENSIONS = {"mp4", "mov", "avi", "mkv"}
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Get client IP
 def get_client_ip():
@@ -54,22 +63,25 @@ def log_event(event, ip, password_attempt="", result=""):
         except Exception as e:
             print("Google Sheet logging failed:", e)
 
+# ===========================================================
+# 🏠 Home Page
+# ===========================================================
 @app.route("/")
 def index():
     ip = get_client_ip()
     log_event("page_visit", ip)
-    return render_template("index.html")
-
+    # ✅ Fix: pass datetime to template
+    return render_template("index.html", datetime=datetime)
 
 # ===========================================================
-# 🆕 MODIFIED SECTION — handles both password & video logs
+# Handles both password & video logs
 # ===========================================================
 @app.route("/log_action", methods=["POST"])
 def log_action():
     data = request.get_json()
     ip = get_client_ip()
 
-    # 🆕 1️⃣ Handle password attempts
+    # Handle password attempts
     if "password" in data:
         entered_password = data.get("password", "")
         correct_password = "23E51A05C1"
@@ -77,17 +89,36 @@ def log_action():
         log_event("password_attempt", ip, entered_password, result)
         return jsonify({"status": "ok", "result": result})
 
-    # 🆕 2️⃣ Handle video button clicks
+    # Handle video button clicks
     elif data.get("action") == "video_button_clicked":
         log_event("video_button_clicked", ip, "", "clicked")
         return jsonify({"status": "ok", "result": "video_click_logged"})
 
-    # 🆕 3️⃣ Handle unknown events (fallback)
+    # Handle unknown events
     else:
         log_event("unknown_event", ip)
         return jsonify({"status": "ok", "result": "unknown_event"})
-# ===========================================================
 
+# ===========================================================
+# 🆕 Upload Story Route (for mobile upload)
+# ===========================================================
+@app.route("/upload_story", methods=["POST"])
+def upload_story():
+    if "video" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files["video"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename("story.mp4")  # overwrite old story
+        save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(save_path)
+        log_event("story_uploaded", get_client_ip(), "", "success")
+        return jsonify({"status": "ok", "message": "Story uploaded successfully"})
+    
+    return jsonify({"error": "Invalid file type"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
